@@ -1,4 +1,4 @@
-5 
+ 
 # NACA4Series
 Processing code for generating NACA 4 digit airfoils
 The program uses two sliders to adjust camber and thickness.  The highpoint is fixed at 40% chord for now.  The NACA4Series.png file is a screenshot of how the sliders work.  At first, all sliders are set to zero and all you get is a flat line.
