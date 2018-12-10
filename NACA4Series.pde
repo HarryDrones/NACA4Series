@@ -1,3 +1,9 @@
+// https://discourse.processing.org/t/processing-to-draw-naca-4-digit-airfoils/5739
+// http://www.airfoiltools.com/airfoil/naca4digit?MNaca4DigitForm%5Bcamber%5D=05&MNaca4DigitForm%5Bposition%5D=40&MNaca4DigitForm%5Bthick%5D=30&MNaca4DigitForm%5BnumPoints%5D=81&MNaca4DigitForm%5BcosSpace%5D=0&MNaca4DigitForm%5BcosSpace%5D=1&MNaca4DigitForm%5BcloseTe%5D=0&MNaca4DigitForm%5BcloseTe%5D=1&yt0=Plot
+// http://www.pdas.com/refs/tm4741.pdf   //different calc
+// https://discourse.processing.org/t/trying-to-use-modelx-but-built-a-spiral-galaxy-of-points/6064
+// https://discourse.processing.org/t/trying-to-use-modelx-but-built-a-spiral-galaxy-of-points/6064/12
+
 int N = 81;  //number of points
 float M = -0.00000f; //2/100.0;
 float[] dydx = new float[81];
@@ -11,6 +17,7 @@ float xL[] = new float[81];
 float yL[] = new float[81];
 float P = 0.4; //0.4; //40/100.0;
 PShape s,s2;
+PFont font;
 float a0 = 0.2969;
 float a1 = -0.126;
 float a2 = -0.3516;
@@ -35,9 +42,45 @@ float[] YUoord = new float[81];
 float[] XLoord = new float[81];
 float[] YLoord = new float[81];
 
+// now the program starts without the file, even without the /data dir what a write could create automatic
+String outfilename  = "data/new.csv";   // take out of draw and make new key [s] for save to file
+
+
+//_____________________________________________________________
+void save_to_file() {
+  Table table = new Table(); 
+  table.addColumn("X");
+  table.addColumn("Y");
+
+  for (int i = 159; i > N-1; i--) {
+    TableRow newRow = table.addRow();
+    newRow.setFloat("X", Xvalues[i] );
+    newRow.setFloat("Y", Yvalues[i] );
+  }  
+  for (int i = 0; i < N-1; i++) {
+    TableRow newRow = table.addRow();
+    newRow.setFloat("X", Xvalues[i] );
+    newRow.setFloat("Y", Yvalues[i] );
+  }
+  saveTable(table, outfilename);
+  println("data saved to "+outfilename);
+}
+
+void keyPressed() {
+  if ( key == 's' )  save_to_file();
+}
+
+void mouseWheel(MouseEvent event) {
+  float e = event.getCount();
+ // if ( keyPressed )  P += 0.01*e; //&& key == 'p' )  P += 0.01*e; 
+  P += 0.01*e;
+}
+
 void setup()
 {
- size( 650, 300, P3D);   
+ size( 650, 300, P3D); 
+   font = loadFont("CourierNew36.vlw"); 
+ 
  controls = new Controls();
  controlX = new HorizontalControl();
  showControls = 1;     
@@ -46,6 +89,7 @@ void setup()
 }
 
  void draw() {
+   
 
     if (mousePressed) {
      if( (showControls == 1) && (controls.isZoomSliderEvent(mouseX, mouseY)) || ( showControls == 1 && controlX.isZoomSliderEvent(mouseX,mouseY))) {
@@ -66,6 +110,10 @@ void setup()
   stroke(182,185,188);
   strokeWeight(1);
   line( width-width, height/2,width, height/2); 
+     textFont(font, 15);
+  textAlign(LEFT, BOTTOM);
+// stroke(0x00ff00);
+  text("Airfoil:\nCamber  : "+M + "\nThickness: "  +T + "\nHighpoint: "  + P  , width/2+150, height/2+120);
 
     if (showControls == 1) {
      controls.render(); 
@@ -75,14 +123,14 @@ void setup()
   controlX.updateZoomSlider(tzoom);
 
   translate(width/2-450/2, height/2);
-  scale(1.5,-1);
+  scale(1.5,-1.5);
   thread( "getOrdinates");
   stroke(0,255,0);
   strokeWeight(4);
   Xvalues = concat(xU,xL);
   Yvalues = concat(yU,yL);
-  XLoord = subset(Xvalues,81,80);
-  YLoord = subset(Yvalues,81,80);
+  XLoord = subset(Xvalues,N,(N-1));
+  YLoord = subset(Yvalues,N,(N-1));
    s = createShape(); 
    s.beginShape();
 // s.fill(125);
@@ -90,19 +138,19 @@ void setup()
    s.stroke(0,255,0);
    s.strokeWeight(2);
 
-        for (int i = 0; i<80; i++){ 
+        for (int i = 0; i<(N-1); i++){ 
            s.vertex(300*XLoord[i],300*YLoord[i]);
        
-           angle = sqrt( ((300 - Xvalues[0]) * (300 - Xvalues[0])) + ((300*Yvalues[80]) * (300*Yvalues[80])) );
-           angle = asin(300*Yvalues[80]/angle);
+           angle = sqrt( ((300 - Xvalues[0]) * (300 - Xvalues[0])) + ((300*Yvalues[N-1]) * (300*Yvalues[N-1])) );
+           angle = asin(300*Yvalues[N-1]/angle);
         }
         XLoord = reverse(XLoord);
         YLoord = reverse(YLoord);
-        for (int i = 0; i<80; i++){ 
+        for (int i = 0; i<(N-1); i++){ 
            s.vertex(300*XLoord[i],300*YLoord[i]);
        
-           angle = sqrt( ((300 - Xvalues[0]) * (300 - Xvalues[0])) + ((300*Yvalues[80]) * (300*Yvalues[80])) );
-           angle = asin(300*Yvalues[80]/angle);
+           angle = sqrt( ((300 - Xvalues[0]) * (300 - Xvalues[0])) + ((300*Yvalues[N-1]) * (300*Yvalues[N-1])) );
+           angle = asin(300*Yvalues[N-1]/angle);
         }
                
    s.endShape(CLOSE);
@@ -110,8 +158,8 @@ void setup()
    shape(s,0,0);
    shearY(-angle);
 
-   XUoord = subset(Xvalues,0,80);
-   YUoord = subset(Yvalues,0,80);
+   XUoord = subset(Xvalues,0,(N-1));
+   YUoord = subset(Yvalues,0,(N-1));
    s2 = createShape(); 
    s2.beginShape();
 // s.fill(125);
@@ -120,25 +168,27 @@ void setup()
    s2.strokeWeight(2);
 
 
-        for (int i = 0; i<80; i++){ 
+        for (int i = 0; i<(N-1); i++){ 
            s2.vertex(300*XUoord[i],300*YUoord[i]);
        
-           angle = sqrt( ((300 - Xvalues[0]) * (300 - Xvalues[0])) + ((300*Yvalues[80]) * (300*Yvalues[80])) );
-           angle = asin(300*Yvalues[80]/angle);
+           angle = sqrt( ((300 - Xvalues[0]) * (300 - Xvalues[0])) + ((300*Yvalues[N-1]) * (300*Yvalues[N-1])) );
+           angle = asin(300*Yvalues[N-1]/angle);
         } 
         XUoord = reverse(XUoord);
         YUoord = reverse(YUoord);
-               for (int i = 0; i<80; i++){ 
+               for (int i = 0; i<(N-1); i++){ 
            s2.vertex(300*XUoord[i],300*YUoord[i]);
         
-           angle = sqrt( ((300 - Xvalues[0]) * (300 - Xvalues[0])) + ((300*Yvalues[80]) * (300*Yvalues[80])) );
-           angle = asin(300*Yvalues[80]/angle);
+           angle = sqrt( ((300 - Xvalues[0]) * (300 - Xvalues[0])) + ((300*Yvalues[N-1]) * (300*Yvalues[N-1])) );
+           angle = asin(300*Yvalues[N-1]/angle);
         }
           
    s2.endShape(CLOSE);
    shearY(-angle); 
    shape(s2,0,0);
 
+  //    Xvalues = concat(xU, reverse(xL));               // return: set the globals with the results
+//  Yvalues = concat(yU,reverse(yL));
         
 }
 
@@ -147,22 +197,22 @@ void getOrdinates(){
    
   for (int i = 0; i < N; i++){
   
-    M = zoom/1000f;
-    T = tzoom/1000f;
+    M = zoom/2500f;
+    T = tzoom/2500f;
 
-    if(i >= 0){
+    if(x[i] >= 0){
        beta[i] = (radians(180)/81.0) * i;
        x[i] = (1 - cos(beta[i]))/2;
      }
-    if(i < 40){
+    if(x[i] < P){
      if (x[i] >= 0){
      y[i] = ((M/(P*P) * (2*P*x[i] - x[i]*x[i])));  // /1.005;
      dydx[i] = (2*M)/(P*P) * (P - x[i]);
      }    
    }  
-    if(i >=40){  
+    if(x[i] >=P){  
     if (x[i] <= 1.00000f){     
-    y[i] = (M/(1-P)*(1-P) * (1 - 2*P + 2*P*x[i] - x[i]*x[i]))*2.725; //* 2.75; //*2.686; 
+    y[i] = (M/((1-P)*(1-P)) * (1 - 2*P + 2*P*x[i] - x[i]*x[i])); //*2.725; //* 2.75; //*2.686; 
     dydx[i] = (2*M/((1-P)*(1-P)) * (P - x[i])); 
      } 
    }    
@@ -170,7 +220,7 @@ void getOrdinates(){
 
    for (int i = 0; i < 81; i++){
    
-       yt[i] = (T/0.2* (sqrt(a0*x[i])+ a1*x[i] + a2*(x[i]*x[i]) + a3*(x[i]*x[i]*x[i]) + a4*(x[i]*x[i]*x[i]*x[i])));
+       yt[i] = (T/0.2* (a0*sqrt(x[i])+ a1*x[i] + a2*(x[i]*x[i]) + a3*(x[i]*x[i]*x[i]) + a4*(x[i]*x[i]*x[i]*x[i])));
        theta[i] = (atan((dydx[i])));
        xU[i] = x[i] - yt[i] * (sin(radians(theta[i]))); 
        yU[i] = ( (y[i] + yt[i]  * (cos(radians(theta[i]))) ) );
@@ -178,5 +228,7 @@ void getOrdinates(){
        yL[i] = (y[i] - yt[i] * cos(radians(theta[i]))); 
          
     }
+    
+
 
 }
