@@ -96,13 +96,14 @@ void setup()
          draggingZoomSlider = true;     
          zoom = controls.getZoomValue(mouseY);
          tzoom = controlX.getZoomValue(mouseX,mouseY);      
-         M = map(M,-0.10,0.10,-zoom,zoom); //,-0.10,0.10);
-         T = map(T,0,12,-tzoom,tzoom);
+       //  M = map(M,-0.10,0.10,-zoom,zoom); //,-0.10,0.10);
+      //   T = map(T,0,12,-tzoom,tzoom);
      }    
            // MousePress - Rotation Adjustment
       else if (!draggingZoomSlider) {
          if (released == true) {
-    
+             M = map(M,-0.10,0.10,-zoom,zoom); //,-0.10,0.10);
+         T = map(T,0,12,-tzoom,tzoom);
             }      
      }
   }
