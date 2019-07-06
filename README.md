@@ -17,3 +17,7 @@ To test the accuracy of the NACA formula used, I adjusted the sliders and mousew
 
 Update:
 One thing that I've fixed on my desktop version is that when the sliders move, the displayed value now shows the camber or thickness value as it is being adjusted instead of the slider value and then when the mouse is released it shows camber or thickness.  I need to get that improvement uploaded here.  The fix is very easy, just move one line of code.  
+
+Update: 
+That annoyance mentioned above about the slider value being displayed until it is released, then the actual camber and tickness value being adjusted is displayed has been fixed in the Naca4Series.pde file.  The standalone application64 has not been updated to reflect this change.  If you have processing installed just download and run from the .pde files outside the application64 directory. If none of that makes sense then copy lines 99 and 100 in NACA4Series.pde and paste them into line 105, then comment out or delete lines 99 and 100.
+This is how you get it to display Only the camber and thickness values as they are adjusted with the sliders.  If that is gibberish, then accept that the true camber and thickness values will only be displayed when the mouse is not controlling a slider.
